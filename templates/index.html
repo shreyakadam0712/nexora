@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nexora · AI Career Guidance</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --cream: #faf8f4; --white: #ffffff; --offwhite: #f5f2ec;
+      --lavender: #e8e0f5; --lavender2: #d4c8f0; --lavender3: #b8a8e8;
+      --lavender4: #9b87d6; --lavender-deep: #7c6bbf;
+      --blush: #f5e6e8; --blush2: #e8c8cd;
+      --sage: #e2ede8; --sage2: #c8ddd0;
+      --peach: #fdeee8;
+      --error: #e8625a; --error-bg: #fdf0ef; --error-border: #f5c5c2;
+      --success: #4a9e6a; --success-bg: #edf7f1; --success-border: #b8dfc8;
+      --text-dark: #2d2640; --text-mid: #5a5272; --text-soft: #8a82a0;
+      --border: #e4dff0; --border2: #d0c8e8;
+      --shadow: rgba(124,107,191,0.12); --shadow2: rgba(124,107,191,0.22);
+      --radius: 18px; --radius-sm: 12px;
+    }
+
+    body { background: var(--cream); color: var(--text-dark); font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+    /* ── Background shapes ── */
+    .bg-shape { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; }
+    .bg-shape-1 { width: 600px; height: 600px; background: radial-gradient(circle, #e8e0f5 0%, transparent 70%); top: -200px; right: -150px; opacity: 0.7; }
+    .bg-shape-2 { width: 500px; height: 500px; background: radial-gradient(circle, #f5e6e8 0%, transparent 70%); bottom: -150px; left: -120px; opacity: 0.6; }
+    .bg-shape-3 { width: 350px; height: 350px; background: radial-gradient(circle, #e2ede8 0%, transparent 70%); top: 40%; left: 30%; opacity: 0.4; }
+
+    /* ── Pages ── */
+    .page { position: relative; z-index: 1; min-height: 100vh; display: none; }
+    .page.active { display: flex; animation: fadeSlideIn 0.55s cubic-bezier(.23,1,.32,1) both; }
+    @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── Navbar ── */
+    .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; background: rgba(250,248,244,0.88); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 900; color: var(--text-dark); display: flex; align-items: center; gap: 8px; }
+    .nav-logo-dot { width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, var(--lavender3), var(--lavender-deep)); }
+    .nav-steps { display: flex; align-items: center; gap: 6px; }
+    .nav-step { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: var(--text-soft); }
+    .nav-step.active { color: var(--lavender-deep); }
+    .nav-step.done { color: #4a9e6a; }
+    .step-circle { width: 26px; height: 26px; border-radius: 50%; background: var(--offwhite); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 800; color: var(--text-soft); transition: all 0.3s; }
+    .nav-step.active .step-circle { background: var(--lavender); border-color: var(--lavender2); color: var(--lavender-deep); }
+    .nav-step.done .step-circle { background: var(--success-bg); border-color: var(--success-border); color: var(--success); content: '✓'; }
+    .step-divider { width: 28px; height: 1.5px; background: var(--border); border-radius: 1px; }
+    .page-padding { padding-top: 80px; }
+
+    /* ── Inputs & Selects ── */
+    .field-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .field-label { font-size: 0.74rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-mid); }
+    .field-hint { font-size: 0.72rem; color: var(--text-soft); font-weight: 500; margin-top: 3px; }
+    .field-input {
+      width: 100%; padding: 13px 16px;
+      background: var(--offwhite); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.95rem; font-weight: 500; color: var(--text-dark);
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s; outline: none;
+    }
+    .field-input:focus { border-color: var(--lavender3); background: var(--white); box-shadow: 0 0 0 4px rgba(180,160,232,0.15); }
+    .field-input::placeholder { color: var(--text-soft); }
+    .field-input.valid { border-color: var(--success-border); background: var(--success-bg); }
+    .field-input.invalid { border-color: var(--error-border); background: var(--error-bg); }
+
+    .field-select {
+      width: 100%; padding: 13px 40px 13px 16px;
+      background: var(--offwhite); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.95rem; font-weight: 500; color: var(--text-dark);
+      transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+      appearance: none; -webkit-appearance: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg width='14' height='9' viewBox='0 0 14 9' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%239b87d6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 15px center;
+    }
+    .field-select:focus { border-color: var(--lavender3); background-color: var(--white); box-shadow: 0 0 0 4px rgba(180,160,232,0.15); }
+    .field-select.invalid { border-color: var(--error-border); background-color: var(--error-bg); }
+
+    /* inline validation message */
+    .val-msg { font-size: 0.72rem; font-weight: 600; margin-top: 4px; display: none; }
+    .val-msg.show { display: block; }
+    .val-msg.err { color: var(--error); }
+    .val-msg.ok  { color: var(--success); }
+
+    /* ── Password strength bar ── */
+    .pw-strength-wrap { margin-top: 6px; }
+    .pw-bar-track { height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .pw-bar-fill { height: 100%; border-radius: 99px; width: 0%; transition: width 0.3s, background 0.3s; }
+    .pw-label { font-size: 0.7rem; font-weight: 700; margin-top: 4px; color: var(--text-soft); }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      width: 100%; padding: 15px;
+      background: linear-gradient(135deg, var(--lavender4) 0%, var(--lavender-deep) 100%);
+      color: white; border: none; border-radius: var(--radius-sm);
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1rem; font-weight: 700;
+      cursor: pointer; margin-top: 8px;
+      box-shadow: 0 8px 24px rgba(124,107,191,0.35);
+      transition: transform 0.15s, box-shadow 0.2s; position: relative; overflow: hidden;
+    }
+    .btn-primary::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%); pointer-events: none; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(124,107,191,0.45); }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-back {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border-radius: 100px;
+      background: var(--white); border: 1.5px solid var(--border2);
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.88rem; font-weight: 700;
+      color: var(--text-mid); cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
+    }
+    .btn-back:hover { background: var(--lavender); border-color: var(--lavender2); color: var(--lavender-deep); transform: translateX(-2px); }
+    .btn-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ── PAGE 1: REGISTER ── */
+    #page-register { align-items: center; justify-content: center; padding: 40px 20px; flex-direction: column; }
+    .register-container { width: 100%; max-width: 980px; display: grid; grid-template-columns: 1fr 1fr; background: var(--white); border-radius: 28px; box-shadow: 0 32px 80px var(--shadow2), 0 0 0 1px var(--border); overflow: hidden; min-height: 620px; }
+    .register-hero { background: linear-gradient(145deg, #c8b8f0 0%, #b8a0e8 30%, #d4c8f0 60%, #e8d8f8 100%); padding: 52px 44px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+    .register-hero::before { content: ''; position: absolute; width: 300px; height: 300px; background: rgba(255,255,255,0.15); border-radius: 50%; top: -80px; right: -80px; }
+    .register-hero::after { content: ''; position: absolute; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%; bottom: -50px; left: -50px; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.3); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.5); color: #4a3878; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 7px 16px; border-radius: 100px; width: fit-content; margin-bottom: 32px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 900; color: #2d1a5e; line-height: 1.15; position: relative; z-index: 1; }
+    .hero-desc { color: #4a3878; font-size: 0.92rem; line-height: 1.7; margin-top: 14px; position: relative; z-index: 1; font-weight: 500; }
+    .hero-stats { display: flex; gap: 20px; margin-top: 32px; position: relative; z-index: 1; }
+    .stat-pill { background: rgba(255,255,255,0.35); border: 1px solid rgba(255,255,255,0.55); backdrop-filter: blur(8px); border-radius: 14px; padding: 12px 16px; text-align: center; }
+    .stat-num { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 800; color: #2d1a5e; }
+    .stat-lbl { font-size: 0.7rem; font-weight: 600; color: #4a3878; letter-spacing: 0.06em; text-transform: uppercase; margin-top: 2px; }
+    .hero-decor { display: flex; gap: 10px; margin-top: 28px; position: relative; z-index: 1; }
+    .decor-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.5); }
+    .decor-dot.active { background: rgba(255,255,255,0.9); width: 28px; border-radius: 5px; }
+    .register-form-wrap { padding: 44px 44px; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; }
+    .form-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 800; color: var(--text-dark); margin-bottom: 4px; }
+    .form-sub { color: var(--text-soft); font-size: 0.88rem; margin-bottom: 26px; font-weight: 500; }
+    .login-link { text-align: center; margin-top: 16px; font-size: 0.85rem; color: var(--text-soft); font-weight: 500; }
+    .login-link span { color: var(--lavender-deep); font-weight: 700; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+
+    /* ── Register alert banner ── */
+    .reg-alert { display: none; align-items: flex-start; gap: 10px; padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 0.85rem; font-weight: 600; }
+    .reg-alert.show { display: flex; }
+    .reg-alert.err { background: var(--error-bg); border: 1.5px solid var(--error-border); color: var(--error); }
+    .reg-alert.ok  { background: var(--success-bg); border: 1.5px solid var(--success-border); color: var(--success); }
+
+    /* ── PAGE 2: QUESTIONNAIRE ── */
+    #page-questionnaire { flex-direction: column; align-items: center; padding: 40px 20px 80px; }
+    .q-top-bar { max-width: 720px; width: 100%; display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; margin-top: 10px; }
+    .q-header { text-align: center; margin-bottom: 28px; max-width: 600px; margin-inline: auto; }
+    .q-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--lavender); border: 1.5px solid var(--lavender2); color: var(--lavender-deep); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 6px 16px; border-radius: 100px; margin-bottom: 14px; }
+    .q-title { font-family: 'Playfair Display', serif; font-size: clamp(1.7rem, 4vw, 2.4rem); font-weight: 900; color: var(--text-dark); line-height: 1.2; }
+    .q-sub { color: var(--text-soft); font-size: 0.92rem; margin-top: 8px; font-weight: 500; line-height: 1.6; }
+    .progress-wrap { max-width: 720px; width: 100%; margin: 0 auto 28px; }
+    .progress-labels { display: flex; justify-content: space-between; font-size: 0.74rem; font-weight: 700; color: var(--text-soft); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+    .progress-track { width: 100%; height: 6px; background: var(--lavender); border-radius: 99px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--lavender3), var(--lavender-deep)); transition: width 0.5s cubic-bezier(.23,1,.32,1); width: 0%; }
+    .q-form { max-width: 720px; width: 100%; }
+    .q-section { background: var(--white); border: 1.5px solid var(--border); border-radius: 22px; padding: 30px 34px; margin-bottom: 18px; box-shadow: 0 4px 24px var(--shadow); transition: box-shadow 0.2s; }
+    .q-section:hover { box-shadow: 0 8px 36px var(--shadow2); }
+    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+    .section-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    .icon-lavender { background: var(--lavender); }
+    .icon-blush { background: var(--blush); }
+    .icon-sage { background: var(--sage); }
+    .icon-peach { background: var(--peach); }
+    .section-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 800; color: var(--text-dark); }
+    .section-desc { font-size: 0.78rem; color: var(--text-soft); font-weight: 500; margin-top: 2px; }
+    .q-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .q-field { display: flex; flex-direction: column; gap: 6px; }
+    .q-label { font-size: 0.73rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-mid); }
+    .q-select {
+      width: 100%; padding: 12px 40px 12px 14px;
+      background: var(--offwhite); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.92rem; font-weight: 600; color: var(--text-dark);
+      cursor: pointer; outline: none; appearance: none; -webkit-appearance: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      background-image: url("data:image/svg+xml,%3Csvg width='14' height='9' viewBox='0 0 14 9' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%239b87d6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 13px center;
+    }
+    .q-select:focus { border-color: var(--lavender3); background-color: var(--white); box-shadow: 0 0 0 4px rgba(180,160,232,0.18); }
+    .q-select.filled { border-color: var(--lavender2); background-color: #f0ebff; }
+    .q-select.err { border-color: var(--error-border) !important; background-color: var(--error-bg) !important; }
+    .score-display { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+    .score-pips { display: flex; gap: 3px; }
+    .pip { width: 18px; height: 5px; border-radius: 3px; background: var(--lavender); transition: background 0.15s; }
+    .pip.filled { background: var(--lavender4); }
+    .score-text { font-size: 0.75rem; font-weight: 700; color: var(--lavender-deep); }
+    .q-submit-wrap { max-width: 720px; width: 100%; margin-top: 8px; }
+    .btn-submit-q {
+      width: 100%; padding: 17px;
+      background: linear-gradient(135deg, #b8a0e8 0%, #7c6bbf 100%);
+      color: white; border: none; border-radius: 18px;
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1rem; font-weight: 800;
+      letter-spacing: 0.03em; cursor: pointer;
+      box-shadow: 0 12px 36px rgba(124,107,191,0.4);
+      transition: transform 0.15s, box-shadow 0.2s;
+      position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-submit-q::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 60%); pointer-events: none; }
+    .btn-submit-q:hover { transform: translateY(-2px); box-shadow: 0 18px 48px rgba(124,107,191,0.5); }
+    .btn-arrow { font-size: 1.2rem; transition: transform 0.2s; }
+    .btn-submit-q:hover .btn-arrow { transform: translateX(5px); }
+
+    /* ── PAGE 3: RESULTS ── */
+    #page-results { flex-direction: column; align-items: center; padding: 50px 20px 80px; }
+    .results-top-bar { max-width: 860px; width: 100%; display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+    .results-header { text-align: center; flex: 1; }
+    .results-badge { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, var(--lavender), var(--blush)); border: 1.5px solid var(--lavender2); color: var(--lavender-deep); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 7px 18px; border-radius: 100px; margin-bottom: 14px; }
+    .results-title { font-family: 'Playfair Display', serif; font-size: clamp(1.7rem, 4vw, 2.6rem); font-weight: 900; color: var(--text-dark); }
+    .results-name { color: var(--lavender-deep); }
+    .results-sub { color: var(--text-soft); margin-top: 8px; font-size: 0.92rem; font-weight: 500; }
+    .results-layout { max-width: 860px; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .career-hero-card { grid-column: 1 / -1; background: linear-gradient(135deg, #c8b8f0 0%, #b0a0e8 40%, #c8d8f8 100%); border-radius: 24px; padding: 38px 42px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 16px 56px rgba(124,107,191,0.3); position: relative; overflow: hidden; }
+    .career-hero-card::before { content: ''; position: absolute; width: 280px; height: 280px; background: rgba(255,255,255,0.15); border-radius: 50%; top: -80px; right: -60px; }
+    .career-hero-label { font-size: 0.73rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(45,26,94,0.6); margin-bottom: 10px; }
+    .career-hero-name { font-family: 'Playfair Display', serif; font-size: clamp(1.7rem, 3.2vw, 2.4rem); font-weight: 900; color: #2d1a5e; line-height: 1.15; margin-bottom: 12px; }
+    .career-hero-desc { font-size: 0.92rem; font-weight: 500; color: rgba(45,26,94,0.7); max-width: 400px; line-height: 1.6; }
+    .match-badge { background: rgba(255,255,255,0.4); border: 1.5px solid rgba(255,255,255,0.6); backdrop-filter: blur(10px); border-radius: 20px; padding: 18px 26px; text-align: center; flex-shrink: 0; margin-left: 24px; }
+    .match-pct { font-family: 'Playfair Display', serif; font-size: 2.6rem; font-weight: 900; color: #2d1a5e; line-height: 1; }
+    .match-lbl { font-size: 0.72rem; font-weight: 700; color: rgba(45,26,94,0.6); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 5px; }
+    .matches-card, .profile-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 22px; padding: 26px 28px; box-shadow: 0 4px 24px var(--shadow); }
+    .card-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 800; color: var(--text-dark); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+    .card-title-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--lavender3); flex-shrink: 0; }
+    .match-item { margin-bottom: 13px; }
+    .match-item:last-child { margin-bottom: 0; }
+    .match-meta { display: flex; justify-content: space-between; margin-bottom: 5px; }
+    .match-career-name { font-size: 0.86rem; font-weight: 700; color: var(--text-dark); }
+    .match-pct-small { font-size: 0.86rem; font-weight: 700; color: var(--lavender-deep); }
+    .match-bar { height: 6px; background: var(--lavender); border-radius: 99px; overflow: hidden; }
+    .match-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--lavender3), var(--lavender-deep)); transition: width 1s cubic-bezier(.23,1,.32,1) 0.3s; }
+    .trait-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .trait-chip { background: var(--offwhite); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+    .trait-key { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-soft); margin-bottom: 3px; }
+    .trait-val { font-size: 0.85rem; font-weight: 700; color: var(--text-dark); }
+    .strengths-card { grid-column: 1 / -1; background: var(--white); border: 1.5px solid var(--border); border-radius: 22px; padding: 26px 28px; box-shadow: 0 4px 24px var(--shadow); }
+    .strengths-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .strength-pill { display: flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 100px; font-size: 0.85rem; font-weight: 700; }
+    .pill-lavender { background: var(--lavender); color: var(--lavender-deep); border: 1.5px solid var(--lavender2); }
+    .pill-blush { background: var(--blush); color: #a06070; border: 1.5px solid var(--blush2); }
+    .pill-sage { background: var(--sage); color: #4a7a5a; border: 1.5px solid var(--sage2); }
+    .pill-peach { background: var(--peach); color: #a06040; border: 1.5px solid #f0ccb8; }
+    .ml-info-card { grid-column: 1 / -1; background: var(--white); border: 1.5px solid var(--border); border-radius: 22px; padding: 22px 28px; box-shadow: 0 4px 24px var(--shadow); }
+    .ml-info-inner { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+    .ml-stat { text-align: center; flex: 1; min-width: 90px; }
+    .ml-stat-num { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900; color: var(--lavender-deep); }
+    .ml-stat-lbl { font-size: 0.7rem; font-weight: 700; color: var(--text-soft); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 3px; }
+    .ml-divider { width: 1px; height: 40px; background: var(--border); flex-shrink: 0; }
+    .ml-algo-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+    .algo-badge { padding: 5px 12px; border-radius: 100px; font-size: 0.78rem; font-weight: 700; }
+    .algo-dt { background: var(--peach); color: #a06040; border: 1.5px solid #f0ccb8; }
+    .algo-rf { background: var(--sage); color: #4a7a5a; border: 1.5px solid var(--sage2); }
+    .retry-wrap { max-width: 860px; width: 100%; margin-top: 20px; display: flex; gap: 12px; }
+    .btn-retry { flex: 1; padding: 13px; background: var(--white); border: 1.5px solid var(--border2); border-radius: 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.92rem; font-weight: 700; color: var(--text-mid); cursor: pointer; transition: all 0.2s; }
+    .btn-retry:hover { background: var(--lavender); border-color: var(--lavender2); color: var(--lavender-deep); }
+    .btn-share { flex: 2; padding: 13px; background: linear-gradient(135deg, var(--lavender4), var(--lavender-deep)); border: none; border-radius: 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.92rem; font-weight: 700; color: white; cursor: pointer; box-shadow: 0 6px 20px rgba(124,107,191,0.3); transition: transform 0.15s, box-shadow 0.2s; }
+    .btn-share:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(124,107,191,0.4); }
+
+    /* ── FEEDBACK WIDGET ── */
+    .feedback-btn {
+      position: fixed; top: 86px; right: 20px; z-index: 99;
+      display: none;
+      align-items: center; gap: 7px;
+      padding: 9px 18px; border-radius: 100px;
+      background: var(--white); border: 1.5px solid var(--lavender2);
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.82rem; font-weight: 700;
+      color: var(--lavender-deep); cursor: pointer;
+      box-shadow: 0 4px 16px var(--shadow);
+      transition: all 0.2s;
+    }
+    .feedback-btn.visible { display: flex; }
+    .feedback-btn:hover { background: var(--lavender); transform: translateY(-1px); box-shadow: 0 6px 20px var(--shadow2); }
+
+    /* Feedback modal backdrop */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(45,38,64,0.45); backdrop-filter: blur(6px); z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-backdrop.open { display: flex; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-box { background: var(--white); border-radius: 24px; padding: 36px; max-width: 440px; width: 100%; box-shadow: 0 24px 64px rgba(45,38,64,0.3); animation: slideUp 0.3s cubic-bezier(.23,1,.32,1); position: relative; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .modal-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: 50%; background: var(--offwhite); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; color: var(--text-soft); transition: all 0.2s; }
+    .modal-close:hover { background: var(--lavender); color: var(--lavender-deep); border-color: var(--lavender2); }
+    .modal-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 800; color: var(--text-dark); margin-bottom: 6px; }
+    .modal-sub { font-size: 0.88rem; color: var(--text-soft); font-weight: 500; margin-bottom: 24px; }
+
+    /* Star rating */
+    .stars-row { display: flex; gap: 8px; margin-bottom: 20px; }
+    .star-btn { font-size: 2rem; cursor: pointer; transition: transform 0.15s; background: none; border: none; line-height: 1; filter: grayscale(1) opacity(0.4); }
+    .star-btn.lit { filter: none; transform: scale(1.1); }
+    .star-btn:hover { transform: scale(1.2); }
+
+    /* Category ratings */
+    .rating-cats { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+    .rating-cat-row { display: flex; align-items: center; justify-content: space-between; }
+    .rating-cat-label { font-size: 0.82rem; font-weight: 700; color: var(--text-mid); }
+    .mini-stars { display: flex; gap: 4px; }
+    .mini-star { font-size: 1.1rem; cursor: pointer; filter: grayscale(1) opacity(0.4); transition: all 0.1s; background: none; border: none; line-height: 1; }
+    .mini-star.lit { filter: none; }
+
+    .feedback-textarea { width: 100%; height: 90px; padding: 12px 14px; background: var(--offwhite); border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.88rem; color: var(--text-dark); resize: none; outline: none; transition: border-color 0.2s; }
+    .feedback-textarea:focus { border-color: var(--lavender3); background: var(--white); }
+    .feedback-textarea::placeholder { color: var(--text-soft); }
+    .btn-submit-feedback { width: 100%; padding: 13px; margin-top: 14px; background: linear-gradient(135deg, var(--lavender4), var(--lavender-deep)); color: white; border: none; border-radius: var(--radius-sm); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.95rem; font-weight: 700; cursor: pointer; box-shadow: 0 6px 18px rgba(124,107,191,0.3); transition: transform 0.15s, box-shadow 0.2s; }
+    .btn-submit-feedback:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(124,107,191,0.4); }
+    .feedback-success { text-align: center; padding: 20px 0; }
+    .feedback-success-icon { font-size: 2.8rem; margin-bottom: 12px; }
+    .feedback-success-text { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 800; color: var(--text-dark); margin-bottom: 6px; }
+    .feedback-success-sub { font-size: 0.85rem; color: var(--text-soft); font-weight: 500; }
+
+    /* ── Loading overlay ── */
+    .loading-overlay { position: fixed; inset: 0; background: rgba(250,248,244,0.94); backdrop-filter: blur(12px); z-index: 200; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 18px; }
+    .loading-overlay.active { display: flex; }
+    .spinner { width: 50px; height: 50px; border-radius: 50%; border: 3px solid var(--lavender); border-top-color: var(--lavender-deep); animation: spin 0.9s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 800; color: var(--text-dark); }
+    .loading-sub { font-size: 0.86rem; font-weight: 500; color: var(--text-soft); }
+    .loading-steps { display: flex; flex-direction: column; gap: 7px; margin-top: 8px; max-width: 300px; width: 100%; }
+    .loading-step { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; font-weight: 600; color: var(--text-soft); opacity: 0; transition: opacity 0.4s; }
+    .loading-step.visible { opacity: 1; color: var(--lavender-deep); }
+    .loading-step::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--lavender3); flex-shrink: 0; }
+    .dot-anim span { animation: blink 1.4s infinite both; }
+    .dot-anim span:nth-child(2) { animation-delay: 0.2s; }
+    .dot-anim span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink { 0%,80%,100% { opacity: 0; } 40% { opacity: 1; } }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .register-container { grid-template-columns: 1fr; }
+      .register-hero { display: none; }
+      .register-form-wrap { padding: 36px 24px; }
+      .results-layout { grid-template-columns: 1fr; }
+      .career-hero-card { flex-direction: column; text-align: center; }
+      .career-hero-card .match-badge { margin-left: 0; margin-top: 18px; }
+      .career-hero-desc { max-width: 100%; }
+      .q-grid { grid-template-columns: 1fr; }
+      .field-row { grid-template-columns: 1fr; }
+      .trait-grid { grid-template-columns: 1fr; }
+      .q-section { padding: 22px 18px; }
+      .navbar { padding: 14px 18px; }
+      .ml-info-inner { flex-direction: column; }
+      .ml-divider { display: none; }
+      .results-top-bar { flex-direction: column; gap: 16px; text-align: center; }
+      .q-top-bar { flex-direction: column; gap: 12px; align-items: flex-start; }
+      .feedback-btn { top: auto; bottom: 20px; right: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-shape bg-shape-1"></div>
+<div class="bg-shape bg-shape-2"></div>
+<div class="bg-shape bg-shape-3"></div>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text">Analysing your profile<span class="dot-anim"><span>.</span><span>.</span><span>.</span></span></div>
+  <div class="loading-sub">Finding your perfect career match</div>
+  <div class="loading-steps">
+    <div class="loading-step" id="ls1">Reviewing your personality & strengths</div>
+    <div class="loading-step" id="ls2">Matching your academic background</div>
+    <div class="loading-step" id="ls3">Evaluating your lifestyle preferences</div>
+    <div class="loading-step" id="ls4">Scoring career compatibility</div>
+    <div class="loading-step" id="ls5">Your results are ready!</div>
+  </div>
+</div>
+
+<!-- Feedback modal -->
+<div class="modal-backdrop" id="feedbackModal">
+  <div class="modal-box">
+    <div class="modal-close" onclick="closeFeedback()">✕</div>
+    <div id="feedbackFormArea">
+      <div class="modal-title">Rate Your Experience</div>
+      <div class="modal-sub">Your feedback helps us improve Nexora for everyone</div>
+
+      <!-- Overall stars -->
+      <div class="q-label" style="margin-bottom:10px;">Overall Experience</div>
+      <div class="stars-row" id="overallStars">
+        <button class="star-btn" data-val="1" onclick="setOverallStar(1)">⭐</button>
+        <button class="star-btn" data-val="2" onclick="setOverallStar(2)">⭐</button>
+        <button class="star-btn" data-val="3" onclick="setOverallStar(3)">⭐</button>
+        <button class="star-btn" data-val="4" onclick="setOverallStar(4)">⭐</button>
+        <button class="star-btn" data-val="5" onclick="setOverallStar(5)">⭐</button>
+      </div>
+
+      <!-- Category ratings -->
+      <div class="q-label" style="margin-bottom:12px;">Rate Specific Areas</div>
+      <div class="rating-cats">
+        <div class="rating-cat-row">
+          <span class="rating-cat-label">Accuracy of Results</span>
+          <div class="mini-stars" id="cat-accuracy">
+            <button class="mini-star" onclick="setCatStar('accuracy',1)">⭐</button>
+            <button class="mini-star" onclick="setCatStar('accuracy',2)">⭐</button>
+            <button class="mini-star" onclick="setCatStar('accuracy',3)">⭐</button>
+            <button class="mini-star" onclick="setCatStar('accuracy',4)">⭐</button>
+            <button class="mini-star" onclick="setCatStar('accuracy',5)">⭐</button>
+          </div>
+        </div>
+        <div class="rating-cat-row">
+          <span class="rating-cat-label">Ease of Use</span>
+          <div class="mini-stars" id="cat-ease">
+            <button class="mini-star" onclick="setCatStar('ease',1)">⭐</button>
+            <button class="mini-star" onclick="setCatStar('ease',2)">⭐</button>
+            <button class="mini-star" onclick="setCatStar('ease',3)">⭐</button>
+            <button class="mini-star" onclick="setCatStar('ease',4)">⭐</button>
+            <button class="mini-star" onclick="setCatStar('ease',5)">⭐</button>
+          </div>
+        </div>
+        <div class="rating-cat-row">
+          <span class="rating-cat-label">Visual Design</span>
+          <div class="mini-stars" id="cat-design">
+            <button class="mini-star" onclick="setCatStar('design',1)">⭐</button>
+            <button class="mini-star" onclick="setCatStar('design',2)">⭐</button>
+            <button class="mini-star" onclick="setCatStar('design',3)">⭐</button>
+            <button class="mini-star" onclick="setCatStar('design',4)">⭐</button>
+            <button class="mini-star" onclick="setCatStar('design',5)">⭐</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="q-label" style="margin-bottom:8px;">Any comments? (optional)</div>
+      <textarea class="feedback-textarea" id="feedbackText" placeholder="Tell us what you think — what worked well, what could be better…"></textarea>
+      <button class="btn-submit-feedback" onclick="submitFeedback()">Submit Feedback →</button>
+    </div>
+    <div id="feedbackSuccess" style="display:none;">
+      <div class="feedback-success">
+        <div class="feedback-success-icon">🎉</div>
+        <div class="feedback-success-text">Thank you so much!</div>
+        <div class="feedback-success-sub">Your feedback helps make Nexora better for every student.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Floating feedback button (visible on results page) -->
+<button class="feedback-btn" id="feedbackFloatBtn" onclick="openFeedback()">
+  <span>⭐</span> Rate Nexora
+</button>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="nav-logo"><div class="nav-logo-dot"></div>Nexora</div>
+  <div class="nav-steps">
+    <div class="nav-step active" id="step1"><div class="step-circle">1</div>Register</div>
+    <div class="step-divider"></div>
+    <div class="nav-step" id="step2"><div class="step-circle">2</div>Profile</div>
+    <div class="step-divider"></div>
+    <div class="nav-step" id="step3"><div class="step-circle">3</div>Results</div>
+  </div>
+</nav>
+
+<!-- ══════════════════ PAGE 1: REGISTER ══════════════════ -->
+<div class="page active page-padding" id="page-register">
+  <div style="display:flex;align-items:center;justify-content:center;width:100%;padding:20px;">
+    <div class="register-container">
+
+      <!-- Hero panel -->
+      <div class="register-hero">
+        <div>
+          <div class="hero-badge">✦ AI-Powered · ML Career Guidance</div>
+          <div class="hero-title">Nexora — Discover Your Perfect Career Path</div>
+          <div class="hero-desc">Answer a few questions and let Nexora match you with the career that best fits your personality, strengths & academic background.</div>
+        </div>
+        <div>
+          <div class="hero-stats">
+            <div class="stat-pill"><div class="stat-num">95%</div><div class="stat-lbl">Accuracy</div></div>
+            <div class="stat-pill"><div class="stat-num">34</div><div class="stat-lbl">Careers</div></div>
+            <div class="stat-pill"><div class="stat-num">2020</div><div class="stat-lbl">Trained On</div></div>
+          </div>
+          <div class="hero-decor">
+            <div class="decor-dot active"></div>
+            <div class="decor-dot"></div>
+            <div class="decor-dot"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form panel -->
+      <div class="register-form-wrap">
+        <div class="form-title">Create Account</div>
+        <div class="form-sub">Start your career discovery journey today</div>
+
+        <!-- Alert banner -->
+        <div class="reg-alert" id="regAlert"></div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <div class="field-label">First Name</div>
+            <input class="field-input" type="text" id="firstName" placeholder="Emma" oninput="validateName('firstName')"/>
+            <div class="val-msg" id="firstName-msg"></div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Last Name</div>
+            <input class="field-input" type="text" id="lastName" placeholder="Wilson" oninput="validateName('lastName')"/>
+            <div class="val-msg" id="lastName-msg"></div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Email Address</div>
+          <input class="field-input" type="email" id="regEmail" placeholder="emma@example.com" oninput="validateEmail()"/>
+          <div class="val-msg" id="email-msg"></div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Password</div>
+          <input class="field-input" type="password" id="regPassword" placeholder="Min. 8 chars, 1 uppercase, 1 number" oninput="validatePassword()"/>
+          <div class="pw-strength-wrap">
+            <div class="pw-bar-track"><div class="pw-bar-fill" id="pwBar"></div></div>
+            <div class="pw-label" id="pwLabel">Enter a password</div>
+          </div>
+          <div class="val-msg" id="password-msg"></div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Confirm Password</div>
+          <input class="field-input" type="password" id="regConfirm" placeholder="Re-enter your password" oninput="validateConfirm()"/>
+          <div class="val-msg" id="confirm-msg"></div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">I am currently a</div>
+          <select class="field-select" id="userRole">
+            <option value="" disabled selected>Select your stage…</option>
+            <option>High School Student</option>
+            <option>Undergraduate Student</option>
+            <option>Graduate Student</option>
+            <option>Working Professional</option>
+            <option>Career Switcher</option>
+            <option>Recent Graduate</option>
+          </select>
+          <div class="val-msg" id="role-msg"></div>
+        </div>
+
+        <button class="btn-primary" onclick="handleRegister()">Continue to Profile Quiz →</button>
+        <div class="login-link">Already have an account? <span onclick="handleRegister()">Sign In</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ PAGE 2: QUESTIONNAIRE ══════════════════ -->
+<div class="page page-padding" id="page-questionnaire">
+
+  <!-- Top bar: back button + badge -->
+  <div class="q-top-bar">
+    <button class="btn-back" onclick="goBack('register')">
+      <svg viewBox="0 0 16 16"><polyline points="10 3 5 8 10 13"/></svg>
+      Back to Register
+    </button>
+    <div class="q-badge">✦ Step 2 of 3 · ML Profile</div>
+  </div>
+
+  <div class="q-header">
+    <div class="q-title">Tell Us About Yourself</div>
+    <div class="q-sub">Your answers help us find your perfect career match.</div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-labels">
+      <span>Your Progress</span>
+      <span id="progressText">0 / 8 completed</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <div class="q-form">
+
+    <!-- Section 1: Personality & Work -->
+    <div class="q-section">
+      <div class="section-header">
+        <div class="section-icon icon-lavender">🧠</div>
+        <div><div class="section-name">Personality & Work Style</div><div class="section-desc">How you think and prefer to work</div></div>
+      </div>
+      <div class="q-grid">
+        <div class="q-field">
+          <div class="q-label">Personality Trait</div>
+          <select class="q-select" name="personality_trait" onchange="onSelectChange(this)">
+            <option value="" disabled selected>Choose your type…</option>
+            <option value="Adventurous">🌟 Adventurous — Seeks new experiences</option>
+            <option value="Analytical">🔵 Analytical — Data & logic driven</option>
+            <option value="Creative">🎨 Creative — Imaginative & artistic</option>
+            <option value="Detail-oriented">🔍 Detail-oriented — Precise & thorough</option>
+            <option value="Empathetic">💜 Empathetic — People & feelings focused</option>
+            <option value="Logical">⚙️ Logical — Systematic thinker</option>
+            <option value="Organized">📋 Organized — Structured & planned</option>
+          </select>
+        </div>
+        <div class="q-field">
+          <div class="q-label">Preferred Work Style</div>
+          <select class="q-select" name="preferred_workstyle" onchange="onSelectChange(this)">
+            <option value="" disabled selected>Choose your style…</option>
+            <option value="Freelance">💼 Freelance — Independent & flexible</option>
+            <option value="Hybrid">🔄 Hybrid — Best of both worlds</option>
+            <option value="Office">🏢 Office — In-person collaboration</option>
+            <option value="Remote">🏠 Remote — Work from anywhere</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Academics -->
+    <div class="q-section">
+      <div class="section-header">
+        <div class="section-icon icon-blush">📚</div>
+        <div><div class="section-name">Academic Background</div><div class="section-desc">Select your stream, then your strongest subject</div></div>
+      </div>
+      <div class="q-grid">
+        <div class="q-field">
+          <div class="q-label">Academic Stream</div>
+          <select class="q-select" id="streamSelect" onchange="onStreamChange(this)">
+            <option value="" disabled selected>Choose your stream…</option>
+            <option value="Science">🔬 Science</option>
+            <option value="Commerce">💼 Commerce</option>
+            <option value="Arts">🎨 Arts / Humanities</option>
+          </select>
+        </div>
+        <div class="q-field">
+          <div class="q-label">Strongest Academic Subject</div>
+          <select class="q-select" name="strongest_academic" id="subjectSelect" onchange="onSelectChange(this)" disabled>
+            <option value="" disabled selected>Choose stream first…</option>
+          </select>
+        </div>
+      </div>
+      <div class="q-grid" style="margin-top:16px;">
+        <div class="q-field">
+          <div class="q-label">Academic Performance</div>
+          <select class="q-select" name="academic_performance" onchange="onSelectChange(this)">
+            <option value="" disabled selected>Choose level…</option>
+            <option value="Poor">🔴 Below Average</option>
+            <option value="Average">🟡 Average — Keep up with peers</option>
+            <option value="Good">🟢 Good — Above average</option>
+            <option value="Excellent">⭐ Excellent — Top of class</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Lifestyle -->
+    <div class="q-section">
+      <div class="section-header">
+        <div class="section-icon icon-sage">🌿</div>
+        <div><div class="section-name">Lifestyle & Aspirations</div><div class="section-desc">The life you want to build</div></div>
+      </div>
+      <div class="q-grid">
+        <div class="q-field">
+          <div class="q-label">Desired Lifestyle</div>
+          <select class="q-select" name="desired_lifestyle" onchange="onSelectChange(this)">
+            <option value="" disabled selected>Choose lifestyle…</option>
+            <option value="Balance">⚖️ Balance — Work & life harmony</option>
+            <option value="Creativity">🎨 Creativity — Art, expression & innovation</option>
+            <option value="Growth">🚀 Growth — High-growth, ambitious</option>
+            <option value="Stability">🍃 Stability — Secure & steady</option>
+          </select>
+        </div>
+        <div class="q-field">
+          <div class="q-label">Social Skills Level</div>
+          <select class="q-select" name="social_skills" onchange="onSelectChange(this); updatePips('social', this.value)">
+            <option value="" disabled selected>Rate your social ease…</option>
+            <option value="1">1 — Very reserved</option>
+            <option value="2">2 — Shy, small groups</option>
+            <option value="3">3 — Somewhat reserved</option>
+            <option value="4">4 — Comfortable in familiar settings</option>
+            <option value="5">5 — Average social comfort</option>
+            <option value="6">6 — Generally outgoing</option>
+            <option value="7">7 — Confident socially</option>
+            <option value="8">8 — Very social and personable</option>
+            <option value="9">9 — Natural connector</option>
+            <option value="10">10 — Highly charismatic networker</option>
+          </select>
+          <div class="score-display">
+            <div class="score-pips" id="social-pips"></div>
+            <div class="score-text" id="social-label">Select a score</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Scores -->
+    <div class="q-section">
+      <div class="section-header">
+        <div class="section-icon icon-peach">⚡</div>
+        <div><div class="section-name">Skills & Scores</div><div class="section-desc">How you rate your key abilities</div></div>
+      </div>
+      <div class="q-grid">
+        <div class="q-field">
+          <div class="q-label">Leadership Score</div>
+          <select class="q-select" name="leadership_score" onchange="onSelectChange(this); updatePips('leadership', this.value)">
+            <option value="" disabled selected>Rate your leadership…</option>
+            <option value="1">1 — Prefer to follow</option>
+            <option value="2">2 — Rarely take initiative</option>
+            <option value="3">3 — Occasionally lead</option>
+            <option value="4">4 — Lead when necessary</option>
+            <option value="5">5 — Comfortable leading</option>
+            <option value="6">6 — Often take charge</option>
+            <option value="7">7 — Natural team leader</option>
+            <option value="8">8 — Inspire & motivate others</option>
+            <option value="9">9 — Strong visionary leader</option>
+            <option value="10">10 — Exceptional leadership</option>
+          </select>
+          <div class="score-display">
+            <div class="score-pips" id="leadership-pips"></div>
+            <div class="score-text" id="leadership-label">Select a score</div>
+          </div>
+        </div>
+        <div class="q-field">
+          <div class="q-label">Creativity Score</div>
+          <select class="q-select" name="creativity_score" onchange="onSelectChange(this); updatePips('creativity', this.value)">
+            <option value="" disabled selected>Rate your creativity…</option>
+            <option value="1">1 — Prefer structured routines</option>
+            <option value="2">2 — Rarely think outside the box</option>
+            <option value="3">3 — Occasionally creative</option>
+            <option value="4">4 — Somewhat creative</option>
+            <option value="5">5 — Average creativity</option>
+            <option value="6">6 — Often find creative solutions</option>
+            <option value="7">7 — Creative thinker</option>
+            <option value="8">8 — Highly imaginative</option>
+            <option value="9">9 — Innovative and original</option>
+            <option value="10">10 — Visionary creative mind</option>
+          </select>
+          <div class="score-display">
+            <div class="score-pips" id="creativity-pips"></div>
+            <div class="score-text" id="creativity-label">Select a score</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end q-form -->
+
+  <div class="q-submit-wrap">
+    <button class="btn-submit-q" onclick="submitQuestionnaire()">
+      Predict with Nexora ML Models
+      <span class="btn-arrow">→</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════ PAGE 3: RESULTS ══════════════════ -->
+<div class="page page-padding" id="page-results">
+
+  <div class="results-top-bar">
+    <button class="btn-back" onclick="goBack('questionnaire')">
+      <svg viewBox="0 0 16 16"><polyline points="10 3 5 8 10 13"/></svg>
+      Back to Profile
+    </button>
+    <div class="results-header">
+      <div class="results-badge">✦ Your Career Match</div>
+      <div class="results-title">Great news, <span class="results-name" id="resultsName">—</span>!</div>
+      <div class="results-sub">We analysed your profile and found your best-fit career paths</div>
+    </div>
+    <!-- Spacer to center header -->
+    <div style="width:140px;"></div>
+  </div>
+
+  <div class="results-layout">
+
+    <div class="career-hero-card">
+      <div class="career-hero-left">
+        <div class="career-hero-label">✦ Your Best Career Match</div>
+        <div class="career-hero-name" id="resultCareer">—</div>
+        <div class="career-hero-desc" id="resultDesc">—</div>
+      </div>
+      <div class="match-badge">
+        <div class="match-pct" id="resultPct">—%</div>
+        <div class="match-lbl">Match Score</div>
+      </div>
+    </div>
+
+    <div class="matches-card">
+      <div class="card-title"><div class="card-title-dot"></div>Top Career Matches</div>
+      <div id="matchesList"></div>
+    </div>
+
+    <div class="profile-card">
+      <div class="card-title"><div class="card-title-dot"></div>Your Profile Summary</div>
+      <div class="trait-grid" id="profileGrid"></div>
+    </div>
+
+    <div class="strengths-card">
+      <div class="card-title"><div class="card-title-dot"></div>Your Key Strengths</div>
+      <div class="strengths-row" id="strengthsList"></div>
+    </div>
+
+
+  </div>
+
+  <div class="retry-wrap">
+    <button class="btn-retry" onclick="restartQuiz()">← Retake Quiz</button>
+    <button class="btn-share" onclick="shareResults()">✨ Share Your Results</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ SCRIPT ═══════════════════════════════════ -->
+<script>
+// ═══════════════════════════════
+// CAREER MATCHING WEIGHTS
+// ═══════════════════════════════
+const ML_MODEL = {
+  subjectWeights: {"Accounting":{"Accountant":0.4396,"Law / Legal":0.2402,"Financial Analyst":0.2062,"Entrepreneur / Startup Founder":0.0355,"Marketing":0.016,"HR Specialist":0.0127,"Digital Marketing":0.0096,"Graphic Designer":0.0069,"Journalism / Media":0.0059,"Finance / Accounting":0.0057},"Business Studies":{"Marketing":0.1397,"Finance / Accounting":0.1372,"Digital Marketing":0.1248,"Accountant":0.1209,"Financial Analyst":0.1092,"HR Specialist":0.0951,"Public Relations Specialist":0.0544,"Entrepreneur / Startup Founder":0.0508,"Law / Legal":0.0352,"Content Creator":0.0291,"Graphic Designer":0.0286,"AI/Data Science":0.0171},"Economics":{"Law / Legal":0.2275,"Financial Analyst":0.1504,"Urban Planning / Smart City Development":0.1431,"Accountant":0.1002,"Entrepreneur / Startup Founder":0.0726,"AI/Data Science":0.0686,"Journalism / Media":0.0645,"Social Worker / Counselor":0.0474,"School Counselor / Career Counselor":0.0316,"Game Developer":0.0254,"Digital Marketing":0.0146,"HR Specialist":0.008},"Computer Science":{"Software Developer":0.1781,"UI/UX Designer or Frontend Developer":0.1597,"Cybersecurity":0.1168,"Data Scientist / Data Analyst":0.1127,"Animator":0.0905,"Game Developer":0.088,"Graphic Designer":0.0678,"AI/Data Science":0.0403,"Entrepreneur / Startup Founder":0.0341,"Research Scientist (Advanced / R&D roles)":0.0219,"Urban Planning / Smart City Development":0.0161,"Finance / Accounting":0.0117},"History":{"Content Creator":0.1462,"Interior Designer":0.1457,"Public Relations Specialist":0.1097,"Journalism / Media":0.1019,"Graphic Designer":0.0886,"Teacher / Professor":0.0788,"Animator":0.0782,"Game Developer":0.0692,"Digital Marketing":0.0351,"Law / Legal":0.0295,"Finance / Accounting":0.0182,"Marketing":0.0179},"Physics":{"Physicist / Physics Research Scientist":0.6413,"Animator":0.0904,"Research Scientist (Advanced / R&D roles)":0.0671,"Game Developer":0.0555,"Teacher / Professor":0.0364,"Cybersecurity":0.0278,"AI/Data Science":0.0266,"Medical Specialist":0.0144,"Urban Planning / Smart City Development":0.0058,"Graphic Designer":0.0057,"Healthcare / Medical":0.0056},"Psychology":{"School Counselor / Career Counselor":0.226,"Psychologist / Therapist":0.1742,"Social Worker / Counselor":0.1418,"HR Specialist":0.0931,"Psychiatrist / Clinical Mental Health Specialist":0.0791,"Teacher / Professor":0.052,"Law / Legal":0.0478,"Public Relations Specialist":0.0409,"Entrepreneur / Startup Founder":0.0365,"AI/Data Science":0.0215,"Healthcare / Medical":0.0205,"Content Creator":0.0168},"Maths":{"Data Scientist / Data Analyst":0.3167,"Urban Planning / Smart City Development":0.0828,"AI/Data Science":0.0746,"Research Scientist (Advanced / R&D roles)":0.0736,"Interior Designer":0.0516,"Psychiatrist / Clinical Mental Health Specialist":0.0373,"Physicist / Physics Research Scientist":0.0354,"Cybersecurity":0.0332,"Teacher / Professor":0.0323,"Environmental Scientist / Sustainability Expert":0.0301,"Healthcare / Medical":0.0283,"Finance / Accounting":0.0277},"Geography":{"Environmental Scientist / Sustainability Expert":0.2646,"Urban Planning / Smart City Development":0.1854,"Wildlife / Environmental Science Career":0.1318,"Interior Designer":0.128,"Research Scientist (Advanced / R&D roles)":0.0752,"AI/Data Science":0.053,"Entrepreneur / Startup Founder":0.0359,"Game Developer":0.0271,"Teacher / Professor":0.0233,"Content Creator":0.0139,"Research Scientist":0.0135,"Digital Marketing":0.0127},"Biology":{"Medical Specialist":0.1903,"Research Scientist":0.182,"Healthcare / Medical":0.1218,"Wildlife / Environmental Science Career":0.1103,"Psychiatrist / Clinical Mental Health Specialist":0.0921,"Research Scientist (Advanced / R&D roles)":0.0748,"Psychologist / Therapist":0.0365,"Entrepreneur / Startup Founder":0.0327,"Teacher / Professor":0.0269,"Journalism / Media":0.023,"Environmental Scientist / Sustainability Expert":0.0196,"Marketing":0.0189},"Chemistry":{"Pharmacy":0.483,"Healthcare / Medical":0.1048,"Environmental Scientist / Sustainability Expert":0.0979,"Research Scientist":0.0788,"Medical Specialist":0.0591,"Psychiatrist / Clinical Mental Health Specialist":0.0539,"Research Scientist (Advanced / R&D roles)":0.0283,"Wildlife / Environmental Science Career":0.0188,"AI/Data Science":0.0129,"Journalism / Media":0.0116,"Teacher / Professor":0.0107,"Digital Marketing":0.0102},"Political Science":{"Law / Legal":0.6534,"Social Worker / Counselor":0.0999,"Journalism / Media":0.0841,"Urban Planning / Smart City Development":0.0519,"Environmental Scientist / Sustainability Expert":0.0466,"Cybersecurity":0.02,"Wildlife / Environmental Science Career":0.0142,"Teacher / Professor":0.0061,"Digital Marketing":0.0057,"Financial Analyst":0.005}},
+  personalityBoost: {"Adventurous":{"Content Creator":0.06,"Entrepreneur / Startup Founder":0.05,"Journalist":0.04,"Wildlife / Environmental Science Career":0.04,"Game Developer":0.03,"Digital Marketing":0.03,"Public Relations Specialist":0.03,"Teacher / Professor":0.02,"Social Worker / Counselor":0.02},"Analytical":{"Data Scientist / Data Analyst":0.07,"AI/Data Science":0.06,"Research Scientist":0.05,"Cybersecurity":0.05,"Financial Analyst":0.04,"Software Developer":0.04,"Accountant":0.03,"Research Scientist (Advanced / R&D roles)":0.04,"Physicist / Physics Research Scientist":0.04},"Creative":{"Graphic Designer":0.07,"Animator":0.07,"Content Creator":0.06,"UI/UX Designer or Frontend Developer":0.06,"Interior Designer":0.05,"Game Developer":0.05,"Journalism / Media":0.04,"Public Relations Specialist":0.03,"Digital Marketing":0.03},"Detail-oriented":{"Accountant":0.06,"Finance / Accounting":0.05,"Pharmacy":0.05,"Research Scientist":0.04,"Data Scientist / Data Analyst":0.04,"Medical Specialist":0.04,"Cybersecurity":0.03,"Law / Legal":0.03},"Empathetic":{"Psychologist / Therapist":0.08,"School Counselor / Career Counselor":0.07,"Social Worker / Counselor":0.07,"Teacher / Professor":0.06,"HR Specialist":0.05,"Psychiatrist / Clinical Mental Health Specialist":0.05,"Healthcare / Medical":0.04,"Medical Specialist":0.03},"Logical":{"Software Developer":0.07,"Data Scientist / Data Analyst":0.06,"AI/Data Science":0.06,"Cybersecurity":0.05,"Research Scientist (Advanced / R&D roles)":0.05,"Physicist / Physics Research Scientist":0.05,"Financial Analyst":0.04,"Urban Planning / Smart City Development":0.03},"Organized":{"HR Specialist":0.06,"Accountant":0.05,"Finance / Accounting":0.05,"Marketing":0.04,"Teacher / Professor":0.04,"Urban Planning / Smart City Development":0.04,"Public Relations Specialist":0.03,"Law / Legal":0.03}},
+  lifestyleBoost: {"Balance":{"Teacher / Professor":0.05,"Healthcare / Medical":0.04,"HR Specialist":0.04,"School Counselor / Career Counselor":0.04,"Data Scientist / Data Analyst":0.04,"UI/UX Designer or Frontend Developer":0.03,"Interior Designer":0.03,"Pharmacy":0.03,"Social Worker / Counselor":0.03,"Law / Legal":0.03},"Creativity":{"Animator":0.07,"Graphic Designer":0.07,"Content Creator":0.06,"Interior Designer":0.06,"UI/UX Designer or Frontend Developer":0.05,"Game Developer":0.05,"Journalism / Media":0.04,"Public Relations Specialist":0.04,"Digital Marketing":0.03},"Growth":{"Entrepreneur / Startup Founder":0.07,"AI/Data Science":0.06,"Financial Analyst":0.05,"Software Developer":0.05,"Law / Legal":0.04,"Data Scientist / Data Analyst":0.04,"Marketing":0.04,"Cybersecurity":0.03,"Public Relations Specialist":0.03},"Stability":{"Accountant":0.07,"Pharmacy":0.06,"Research Scientist":0.05,"Teacher / Professor":0.05,"Healthcare / Medical":0.04,"Finance / Accounting":0.04,"HR Specialist":0.03,"Medical Specialist":0.03,"Environmental Scientist / Sustainability Expert":0.03}},
+  scoreWeights: {"social":{"AI/Data Science":0.0294,"Accountant":0.0003,"Animator":-0.0338,"Content Creator":0.0314,"Cybersecurity":0.029,"Data Scientist / Data Analyst":-0.297,"Digital Marketing":0.0369,"Entrepreneur / Startup Founder":0.0334,"Environmental Scientist / Sustainability Expert":0.0285,"Finance / Accounting":-0.1438,"Financial Analyst":0.0364,"Game Developer":0.0292,"Graphic Designer":-0.008,"HR Specialist":0.0357,"Healthcare / Medical":0.0317,"Interior Designer":0.0229,"Journalism / Media":0.0385,"Law / Legal":0.0968,"Marketing":-0.1278,"Medical Specialist":0.038,"Pharmacy":0.0333,"Physicist / Physics Research Scientist":0.0383,"Psychiatrist / Clinical Mental Health Specialist":0.0395,"Psychologist / Therapist":0.0392,"Public Relations Specialist":0.0371,"Research Scientist":0.0308,"Research Scientist (Advanced / R&D roles)":0.0386,"School Counselor / Career Counselor":0.0413,"Social Worker / Counselor":0.0393,"Software Developer":-0.167,"Teacher / Professor":0.0348,"UI/UX Designer or Frontend Developer":-0.1644,"Urban Planning / Smart City Development":0.028,"Wildlife / Environmental Science Career":0.0235},"leadership":{"AI/Data Science":0.0363,"Accountant":-0.0474,"Animator":-0.059,"Content Creator":0.0362,"Cybersecurity":0.036,"Data Scientist / Data Analyst":-0.2737,"Digital Marketing":0.046,"Entrepreneur / Startup Founder":0.0427,"Environmental Scientist / Sustainability Expert":0.0371,"Finance / Accounting":-0.1207,"Financial Analyst":0.0412,"Game Developer":0.0159,"Graphic Designer":-0.0279,"HR Specialist":0.0228,"Healthcare / Medical":0.0354,"Interior Designer":0.0043,"Journalism / Media":0.0462,"Law / Legal":0.0997,"Marketing":-0.1055,"Medical Specialist":0.0423,"Pharmacy":0.0312,"Physicist / Physics Research Scientist":0.0181,"Psychiatrist / Clinical Mental Health Specialist":0.042,"Psychologist / Therapist":0.0431,"Public Relations Specialist":0.0237,"Research Scientist":0.0261,"Research Scientist (Advanced / R&D roles)":0.0274,"School Counselor / Career Counselor":0.0467,"Social Worker / Counselor":0.0444,"Software Developer":-0.1546,"Teacher / Professor":0.0404,"UI/UX Designer or Frontend Developer":-0.1482,"Urban Planning / Smart City Development":0.0317,"Wildlife / Environmental Science Career":0.0201},"creativity":{"AI/Data Science":0.0068,"Accountant":-0.0283,"Animator":0.0412,"Content Creator":0.0188,"Cybersecurity":0.0142,"Data Scientist / Data Analyst":-0.294,"Digital Marketing":0.0462,"Entrepreneur / Startup Founder":0.0449,"Environmental Scientist / Sustainability Expert":0.0316,"Finance / Accounting":-0.1297,"Financial Analyst":0.0384,"Game Developer":0.0204,"Graphic Designer":0.0343,"HR Specialist":-0.0126,"Healthcare / Medical":0.0129,"Interior Designer":0.0462,"Journalism / Media":0.0264,"Law / Legal":0.1158,"Marketing":-0.1143,"Medical Specialist":0.0353,"Pharmacy":0.0344,"Physicist / Physics Research Scientist":0.0047,"Psychiatrist / Clinical Mental Health Specialist":0.0419,"Psychologist / Therapist":0.0403,"Public Relations Specialist":0.0341,"Research Scientist":0.0294,"Research Scientist (Advanced / R&D roles)":0.0159,"School Counselor / Career Counselor":0.0469,"Social Worker / Counselor":0.0349,"Software Developer":-0.1673,"Teacher / Professor":0.0234,"UI/UX Designer or Frontend Developer":-0.1629,"Urban Planning / Smart City Development":0.0271,"Wildlife / Environmental Science Career":0.0428}}
+};
+
+const CAREER_DESCS = {
+  "Accountant":"Manage finances, audits, and tax compliance — the backbone of every business.",
+  "AI/Data Science":"Build intelligent systems and extract insights from data at the frontier of technology.",
+  "Animator":"Bring characters and stories to life through motion, art, and imagination.",
+  "Content Creator":"Build audiences, tell stories, and inspire communities through digital media.",
+  "Cybersecurity":"Defend systems and networks from threats in an ever-evolving digital landscape.",
+  "Data Scientist / Data Analyst":"Transform raw data into strategic decisions that drive organisations forward.",
+  "Digital Marketing":"Create campaigns that connect brands with millions across digital platforms.",
+  "Entrepreneur / Startup Founder":"Build something from nothing — lead your own vision, product, and team.",
+  "Environmental Scientist / Sustainability Expert":"Protect the planet through research, policy, and sustainable solutions.",
+  "Finance / Accounting":"Manage capital, investments, and financial strategy at enterprise scale.",
+  "Financial Analyst":"Analyse markets, build models, and guide high-stakes investment decisions.",
+  "Game Developer":"Design and engineer interactive worlds that entertain and challenge players.",
+  "Graphic Designer":"Craft compelling visual identities that shape how brands are perceived.",
+  "HR Specialist":"Connect people with organisations and build thriving workplace cultures.",
+  "Healthcare / Medical":"Deliver care, diagnose conditions, and improve patient outcomes every day.",
+  "Interior Designer":"Transform spaces into functional, beautiful environments people love.",
+  "Journalism / Media":"Uncover truth, tell important stories, and inform the public.",
+  "Law / Legal":"Advocate for justice, navigate legal systems, and shape society through law.",
+  "Marketing":"Build brands, understand consumers, and drive business growth through strategy.",
+  "Medical Specialist":"Diagnose and treat complex medical conditions with expertise and precision.",
+  "Pharmacy":"Dispense medicines, counsel patients, and ensure safe pharmaceutical care.",
+  "Physicist / Physics Research Scientist":"Unravel the fundamental laws of the universe through rigorous experimentation.",
+  "Psychiatrist / Clinical Mental Health Specialist":"Diagnose and treat mental health conditions, changing lives through clinical expertise.",
+  "Psychologist / Therapist":"Understand the human mind and help people overcome challenges.",
+  "Public Relations Specialist":"Shape public perception, manage reputation, and communicate brand stories.",
+  "Research Scientist":"Advance human knowledge through systematic experimentation and discovery.",
+  "Research Scientist (Advanced / R&D roles)":"Lead cutting-edge research and innovation at the frontier of your field.",
+  "School Counselor / Career Counselor":"Guide students through academic challenges and help them find their path.",
+  "Social Worker / Counselor":"Advocate for vulnerable individuals and communities, creating meaningful change.",
+  "Software Developer":"Build the digital products and systems that power the modern world.",
+  "Teacher / Professor":"Shape the next generation through knowledge, mentorship, and inspiration.",
+  "UI/UX Designer or Frontend Developer":"Create intuitive, beautiful digital experiences that delight millions.",
+  "Urban Planning / Smart City Development":"Design the cities and infrastructure of tomorrow through data and vision.",
+  "Wildlife / Environmental Science Career":"Protect ecosystems and biodiversity through fieldwork, research, and conservation."
+};
+
+const STREAM_SUBJECTS = {
+  Science:  [{value:'Physics',label:'⚛️ Physics'},{value:'Chemistry',label:'🧪 Chemistry'},{value:'Maths',label:'📐 Mathematics'},{value:'Computer Science',label:'💻 Computer Science'},{value:'Biology',label:'🧬 Biology'}],
+  Commerce: [{value:'Economics',label:'📊 Economics'},{value:'Accounting',label:'📋 Accounting'},{value:'Business Studies',label:'💼 Business Studies'}],
+  Arts:     [{value:'History',label:'🏛️ History'},{value:'Political Science',label:'⚖️ Political Science'},{value:'Psychology',label:'🧠 Psychology'},{value:'Geography',label:'🌍 Geography'}]
+};
+
+// ── State ──
+let userData = {};
+let formData = {};
+let overallRating = 0;
+let catRatings = { accuracy: 0, ease: 0, design: 0 };
+const TOTAL_FIELDS = 8;
+
+// ── Init pips ──
+['social','leadership','creativity'].forEach(id => {
+  const el = document.getElementById(`${id}-pips`);
+  for(let i=0;i<10;i++){
+    const p = document.createElement('div');
+    p.className='pip'; p.id=`${id}-pip-${i}`;
+    el.appendChild(p);
+  }
+});
+
+// ═══════════════════════════════
+// VALIDATION — REGISTER PAGE
+// ═══════════════════════════════
+function validateName(id) {
+  const input = document.getElementById(id);
+  const msg   = document.getElementById(`${id}-msg`);
+  const v     = input.value.trim();
+  if (!v) {
+    setField(input, msg, 'neutral', '');
+  } else if (v.length < 2 || /[^a-zA-Z\s'-]/.test(v)) {
+    setField(input, msg, 'err', 'Please enter a valid name (letters only, min 2 chars)');
+  } else {
+    setField(input, msg, 'ok', '✓ Looks good');
+  }
+}
+
+function validateEmail() {
+  const input = document.getElementById('regEmail');
+  const msg   = document.getElementById('email-msg');
+  const v     = input.value.trim().toLowerCase();
+
+  // Allowed email providers (whitelist)
+  const ALLOWED_DOMAINS = [
+    'gmail.com','yahoo.com','yahoo.in','yahoo.co.in','yahoo.co.uk',
+    'yahoo.com.au','yahoo.ca','yahoo.fr','yahoo.de','yahoo.es','yahoo.it',
+    'rediffmail.com','hotmail.com','hotmail.in','hotmail.co.uk',
+    'outlook.com','outlook.in','outlook.co.uk','live.com','live.in',
+    'icloud.com','me.com','mac.com',
+    'protonmail.com','proton.me',
+    'zoho.com','aol.com',
+    'ymail.com','rocketmail.com',
+    'gmx.com','gmx.net','gmx.de',
+    'tutanota.com','tutamail.com',
+    'mail.com','inbox.com','fastmail.com',
+    'msn.com','windowslive.com',
+    'edu.com','college.com'
+  ];
+
+  if (!v) {
+    setField(input, msg, 'neutral', '');
+    return;
+  }
+
+  // Basic format check: localpart@domain.tld
+  // localpart: min 3 chars, letters/digits/dots/underscores/hyphens/plus
+  // No leading/trailing dot, no consecutive dots
+  const formatRe = /^[a-zA-Z0-9]([a-zA-Z0-9._+\-]*[a-zA-Z0-9])?@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+  const atParts  = v.split('@');
+
+  if (atParts.length !== 2) {
+    setField(input, msg, 'err', '✗ Invalid email — missing or extra "@" symbol');
+    return;
+  }
+
+  const local  = atParts[0];
+  const domain = atParts[1];
+
+  // Minimum 3 chars before @
+  if (local.length < 3) {
+    setField(input, msg, 'err', '✗ Invalid email — username too short (min 3 characters before @)');
+    return;
+  }
+
+  // No consecutive dots
+  if (/\.\./.test(v)) {
+    setField(input, msg, 'err', '✗ Invalid email — consecutive dots are not allowed');
+    return;
+  }
+
+  // Full format must match
+  if (!formatRe.test(v)) {
+    setField(input, msg, 'err', '✗ Invalid email — use format: yourname@gmail.com');
+    return;
+  }
+
+  // Domain must be in the allowed whitelist
+  if (!ALLOWED_DOMAINS.includes(domain)) {
+    setField(input, msg, 'err', `✗ Invalid email — only recognised providers allowed (e.g. Gmail, Yahoo, Outlook, Rediffmail, iCloud…)`);
+    return;
+  }
+
+  setField(input, msg, 'ok', '✓ Valid email address');
+}
+
+function validatePassword() {
+  const input = document.getElementById('regPassword');
+  const msg   = document.getElementById('password-msg');
+  const bar   = document.getElementById('pwBar');
+  const lbl   = document.getElementById('pwLabel');
+  const v     = input.value;
+
+  let score = 0;
+  if (v.length >= 8)          score++;
+  if (/[A-Z]/.test(v))        score++;
+  if (/[0-9]/.test(v))        score++;
+  if (/[^a-zA-Z0-9]/.test(v)) score++;
+
+  const colors = ['#e8625a','#f0a060','#f0c840','#4a9e6a'];
+  const labels = ['Too weak','Weak','Good','Strong'];
+  const widths = ['25%','50%','75%','100%'];
+
+  if (!v) {
+    bar.style.width = '0%'; lbl.textContent = 'Enter a password';
+    setField(input, msg, 'neutral', '');
+    return;
+  }
+
+  const idx = Math.min(score - 1, 3);
+  bar.style.width = widths[idx];
+  bar.style.background = colors[idx];
+  lbl.textContent = labels[idx];
+  lbl.style.color = colors[idx];
+
+  if (score < 2) {
+    setField(input, msg, 'err', 'Use at least 8 chars with uppercase & a number');
+  } else if (score === 4) {
+    setField(input, msg, 'ok', '✓ Strong password');
+  } else {
+    setField(input, msg, 'neutral', '');
+  }
+
+  // Re-validate confirm if filled
+  if (document.getElementById('regConfirm').value) validateConfirm();
+}
+
+function validateConfirm() {
+  const pw  = document.getElementById('regPassword').value;
+  const cf  = document.getElementById('regConfirm');
+  const msg = document.getElementById('confirm-msg');
+  if (!cf.value) { setField(cf, msg, 'neutral', ''); return; }
+  if (cf.value === pw) {
+    setField(cf, msg, 'ok', '✓ Passwords match');
+  } else {
+    setField(cf, msg, 'err', 'Passwords do not match');
+  }
+}
+
+function setField(input, msgEl, state, text) {
+  input.classList.remove('valid','invalid');
+  msgEl.classList.remove('show','ok','err');
+  if (state === 'ok')    { input.classList.add('valid');   msgEl.classList.add('show','ok');  }
+  if (state === 'err')   { input.classList.add('invalid'); msgEl.classList.add('show','err'); }
+  msgEl.textContent = text;
+}
+
+function showAlert(msg, type) {
+  const el = document.getElementById('regAlert');
+  el.textContent = (type === 'err' ? '⚠ ' : '✓ ') + msg;
+  el.className = `reg-alert show ${type}`;
+}
+
+function hideAlert() {
+  document.getElementById('regAlert').className = 'reg-alert';
+}
+
+function handleRegister() {
+  hideAlert();
+  let ok = true;
+
+  const firstName = document.getElementById('firstName').value.trim();
+  const lastName  = document.getElementById('lastName').value.trim();
+  const email     = document.getElementById('regEmail').value.trim();
+  const password  = document.getElementById('regPassword').value;
+  const confirm   = document.getElementById('regConfirm').value;
+  const role      = document.getElementById('userRole').value;
+
+  // First name
+  if (!firstName || firstName.length < 2 || /[^a-zA-Z\s'-]/.test(firstName)) {
+    validateName('firstName'); ok = false;
+  }
+  // Last name
+  if (!lastName || lastName.length < 2 || /[^a-zA-Z\s'-]/.test(lastName)) {
+    validateName('lastName'); ok = false;
+  }
+  // Email — strict domain whitelist (matches validateEmail logic)
+  const _eAllowed = ['gmail.com','yahoo.com','yahoo.in','yahoo.co.in','yahoo.co.uk','yahoo.com.au','yahoo.ca','yahoo.fr','yahoo.de','yahoo.es','yahoo.it','rediffmail.com','hotmail.com','hotmail.in','hotmail.co.uk','outlook.com','outlook.in','outlook.co.uk','live.com','live.in','icloud.com','me.com','mac.com','protonmail.com','proton.me','zoho.com','aol.com','ymail.com','rocketmail.com','gmx.com','gmx.net','gmx.de','tutanota.com','tutamail.com','mail.com','inbox.com','fastmail.com','msn.com','windowslive.com','edu.com','college.com'];
+  const _eRe = /^[a-zA-Z0-9]([a-zA-Z0-9._+\-]*[a-zA-Z0-9])?@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+  const _eParts = email.toLowerCase().split('@');
+  const _eValid = email.length > 0 && _eParts.length === 2 && _eParts[0].length >= 3 && _eRe.test(email) && _eAllowed.includes(_eParts[1]) && !email.includes('..');
+  if (!_eValid) {
+    validateEmail(); ok = false;
+  }
+  // Password strength
+  let pwScore = 0;
+  if (password.length >= 8)          pwScore++;
+  if (/[A-Z]/.test(password))        pwScore++;
+  if (/[0-9]/.test(password))        pwScore++;
+  if (/[^a-zA-Z0-9]/.test(password)) pwScore++;
+  if (!password || pwScore < 2) {
+    validatePassword(); ok = false;
+  }
+  // Confirm
+  if (!confirm || confirm !== password) {
+    validateConfirm(); ok = false;
+  }
+  // Role
+  if (!role) {
+    const roleSel = document.getElementById('userRole');
+    const roleMsg = document.getElementById('role-msg');
+    roleSel.classList.add('invalid');
+    roleMsg.textContent = 'Please select your current stage';
+    roleMsg.className = 'val-msg show err';
+    ok = false;
+  } else {
+    document.getElementById('userRole').classList.remove('invalid');
+    document.getElementById('role-msg').className = 'val-msg';
+  }
+
+  if (!ok) {
+    showAlert('Please fix the highlighted errors before continuing.', 'err');
+    return;
+  }
+
+  // All valid — proceed
+  userData.name = firstName;
+  userData.email = email;
+  userData.role  = role;
+
+  showPage('questionnaire');
+  updateStep(2);
+}
+
+// ═══════════════════════════════
+// QUESTIONNAIRE LOGIC
+// ═══════════════════════════════
+function updatePips(type, val) {
+  const v = parseInt(val);
+  for(let i=0;i<10;i++) {
+    document.getElementById(`${type}-pip-${i}`).className = 'pip'+(i<v?' filled':'');
+  }
+  const labels = {1:'Very Low',2:'Very Low',3:'Low',4:'Below Avg',5:'Average',6:'Above Avg',7:'Good',8:'High',9:'Very High',10:'Exceptional'};
+  document.getElementById(`${type}-label`).textContent = `${v}/10 — ${labels[v]}`;
+}
+
+function onStreamChange(sel) {
+  const stream = sel.value;
+  const sub = document.getElementById('subjectSelect');
+  sub.innerHTML = '<option value="" disabled selected>Choose subject…</option>';
+  sub.disabled = false;
+  (STREAM_SUBJECTS[stream]||[]).forEach(s => {
+    const o = document.createElement('option');
+    o.value = s.value; o.textContent = s.label;
+    sub.appendChild(o);
+  });
+  sel.classList.add('filled');
+  updateProgress();
+}
+
+function onSelectChange(el) {
+  el.classList.toggle('filled', !!el.value);
+  el.classList.remove('err');
+  updateProgress();
+}
+
+function updateProgress() {
+  const selects = document.querySelectorAll('#page-questionnaire .q-select:not(#streamSelect)');
+  let filled = 0;
+  selects.forEach(s => { if(s.value && !s.disabled) filled++; });
+  const pct = Math.round((filled / TOTAL_FIELDS) * 100);
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('progressText').textContent = `${filled} / ${TOTAL_FIELDS} completed`;
+}
+
+function submitQuestionnaire() {
+  const required = ['personality_trait','preferred_workstyle','strongest_academic','academic_performance','desired_lifestyle','social_skills','leadership_score','creativity_score'];
+  const answers = {};
+  let valid = true;
+
+  required.forEach(name => {
+    const el = document.querySelector(`[name="${name}"]`);
+    if (!el || !el.value || el.disabled) {
+      valid = false;
+      if (el) el.classList.add('err');
+    } else {
+      el.classList.remove('err');
+      answers[name] = el.value;
+    }
+  });
+
+  if (!valid) {
+    alert('Please complete all questions before predicting. ✨');
+    return;
+  }
+
+  formData = answers;
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.classList.add('active');
+
+  ['ls1','ls2','ls3','ls4','ls5'].forEach((id, i) => {
+    setTimeout(() => document.getElementById(id).classList.add('visible'), i * 380);
+  });
+
+  setTimeout(() => {
+    overlay.classList.remove('active');
+    ['ls1','ls2','ls3','ls4','ls5'].forEach(id => document.getElementById(id).classList.remove('visible'));
+
+    const results   = runMLPrediction(answers);
+    const [topCareer, topPct] = results[0];
+    const name = userData.name || 'there';
+
+    document.getElementById('resultsName').textContent = name;
+    document.getElementById('resultCareer').textContent = topCareer;
+    document.getElementById('resultPct').textContent = topPct + '%';
+    document.getElementById('resultDesc').textContent = CAREER_DESCS[topCareer] || 'An excellent career match for your unique profile.';
+
+    // Top 5 matches
+    const matchesEl = document.getElementById('matchesList');
+    matchesEl.innerHTML = '';
+    results.slice(0,5).forEach(([career, pct]) => {
+      matchesEl.innerHTML += `<div class="match-item"><div class="match-meta"><div class="match-career-name">${career}</div><div class="match-pct-small">${pct}%</div></div><div class="match-bar"><div class="match-fill" style="width:0%" data-width="${pct}%"></div></div></div>`;
+    });
+
+    // Profile summary
+    const labels = {personality_trait:'Personality',preferred_workstyle:'Work Style',strongest_academic:'Top Subject',academic_performance:'Performance',desired_lifestyle:'Lifestyle',social_skills:'Social Skills',leadership_score:'Leadership',creativity_score:'Creativity'};
+    document.getElementById('profileGrid').innerHTML = Object.entries(answers).map(([k,v]) =>
+      `<div class="trait-chip"><div class="trait-key">${labels[k]||k}</div><div class="trait-val">${v}${['social_skills','leadership_score','creativity_score'].includes(k)?'/10':''}</div></div>`
+    ).join('');
+
+    // Strengths
+    document.getElementById('strengthsList').innerHTML = getStrengths(answers)
+      .map(s => `<div class="strength-pill ${s.cls}">✦ ${s.label}</div>`).join('');
+
+    showPage('results');
+    updateStep(3);
+    document.getElementById('feedbackFloatBtn').classList.add('visible');
+
+    setTimeout(() => {
+      document.querySelectorAll('.match-fill').forEach(el => { el.style.width = el.dataset.width; });
+    }, 300);
+
+  }, 2400);
+}
+
+// ═══════════════════════════════
+// ML PREDICTION ENGINE
+// ═══════════════════════════════
+function runMLPrediction(answers) {
+  const { strongest_academic: subject, personality_trait: personality, desired_lifestyle: lifestyle,
+          social_skills, leadership_score, creativity_score, academic_performance: performance, preferred_workstyle: workstyle } = answers;
+  const social = parseFloat(social_skills), leadership = parseFloat(leadership_score), creativity = parseFloat(creativity_score);
+
+  const allCareers = Object.keys(CAREER_DESCS);
+  const scores = {};
+  allCareers.forEach(c => scores[c] = 0);
+
+  // RF: subject weights
+  const sw = ML_MODEL.subjectWeights[subject] || {};
+  Object.entries(sw).forEach(([c,w]) => { scores[c] = (scores[c]||0) + w * 3.5; });
+
+  // RF: personality boost
+  const pb = ML_MODEL.personalityBoost[personality] || {};
+  Object.entries(pb).forEach(([c,w]) => { scores[c] = (scores[c]||0) + w * 2.0; });
+
+  // RF: lifestyle boost
+  const lb = ML_MODEL.lifestyleBoost[lifestyle] || {};
+  Object.entries(lb).forEach(([c,w]) => { scores[c] = (scores[c]||0) + w * 2.5; });
+
+  // RF: numeric score weights
+  const sn = (social - 5.5)/4.5, ln = (leadership - 5.5)/4.5, cn = (creativity - 5.5)/4.5;
+  Object.entries(ML_MODEL.scoreWeights.social).forEach(([c,w]) => { scores[c] = (scores[c]||0) + w * sn * 2.0; });
+  Object.entries(ML_MODEL.scoreWeights.leadership).forEach(([c,w]) => { scores[c] = (scores[c]||0) + w * ln * 1.9; });
+  Object.entries(ML_MODEL.scoreWeights.creativity).forEach(([c,w]) => { scores[c] = (scores[c]||0) + w * cn * 2.2; });
+
+  // Performance boost
+  const pBoost = {Excellent:0.08,Good:0.04,Average:0,Poor:-0.05}[performance]||0;
+  Object.keys(scores).forEach(c => { scores[c] += pBoost * 0.5; });
+
+  // Workstyle alignment
+  const wsMap = {
+    Freelance: ['Content Creator','Graphic Designer','UI/UX Designer or Frontend Developer','Animator','Digital Marketing','Journalist'],
+    Remote:    ['Software Developer','Data Scientist / Data Analyst','AI/Data Science','Cybersecurity','Game Developer'],
+    Office:    ['Law / Legal','Medical Specialist','Healthcare / Medical','Pharmacy','Teacher / Professor','Psychiatrist / Clinical Mental Health Specialist'],
+    Hybrid:    ['Entrepreneur / Startup Founder','Marketing','HR Specialist','Public Relations Specialist','Urban Planning / Smart City Development']
+  };
+  (wsMap[workstyle]||[]).forEach(c => { if(scores[c]!==undefined) scores[c] += 0.06; });
+
+  // DT component
+  const dtScores = {};
+  allCareers.forEach(c => dtScores[c] = 0);
+  Object.entries(ML_MODEL.subjectWeights[subject]||{}).forEach(([c,w]) => { dtScores[c] = w * 4.0; });
+
+  // DT personality rules (updated for new traits)
+  const dtRules = {
+    Analytical:     ['Data Scientist / Data Analyst','Research Scientist','Cybersecurity','AI/Data Science'],
+    Logical:        ['Software Developer','Research Scientist (Advanced / R&D roles)','Physicist / Physics Research Scientist'],
+    Creative:       ['Graphic Designer','Animator','Content Creator','UI/UX Designer or Frontend Developer'],
+    Empathetic:     ['Psychologist / Therapist','School Counselor / Career Counselor','Social Worker / Counselor'],
+    Organized:      ['Accountant','HR Specialist','Teacher / Professor'],
+    Adventurous:    ['Content Creator','Entrepreneur / Startup Founder','Wildlife / Environmental Science Career'],
+    'Detail-oriented': ['Accountant','Pharmacy','Research Scientist','Medical Specialist']
+  };
+  (dtRules[personality]||[]).forEach(c => { if(dtScores[c]!==undefined) dtScores[c] += 0.1; });
+
+  // Ensemble RF(0.7) + DT(0.3)
+  const ensemble = {};
+  allCareers.forEach(c => { ensemble[c] = (scores[c]||0)*0.7 + (dtScores[c]||0)*0.3; });
+
+  const sorted = Object.entries(ensemble).sort((a,b) => b[1]-a[1]);
+  const topRaw = sorted[0][1], minRaw = sorted[sorted.length-1][1], range = topRaw - minRaw;
+  const final = sorted.map(([c,s]) => [c, Math.min(98, Math.round(72 + (range>0?(s-minRaw)/range:0)*26))]);
+  if(final[0]) final[0][1] = 97;
+  if(final[1]) final[1][1] = Math.min(92, final[1][1]);
+  return final;
+}
+
+function getStrengths(answers) {
+  const social = parseInt(answers.social_skills), lead = parseInt(answers.leadership_score), creat = parseInt(answers.creativity_score);
+  const s = [];
+  const ptMap = {Adventurous:{label:'Bold Explorer',cls:'pill-peach'},Analytical:{label:'Analytical Thinker',cls:'pill-lavender'},Creative:{label:'Creative Visionary',cls:'pill-sage'},
+    'Detail-oriented':{label:'Detail Master',cls:'pill-lavender'},Empathetic:{label:'Empathetic Leader',cls:'pill-blush'},Logical:{label:'Logical Solver',cls:'pill-lavender'},Organized:{label:'Organised Achiever',cls:'pill-sage'}};
+  if(ptMap[answers.personality_trait]) s.push(ptMap[answers.personality_trait]);
+  if(social>=7) s.push({label:'Strong Communicator',cls:'pill-blush'});
+  if(lead>=7)   s.push({label:'Natural Leader',cls:'pill-peach'});
+  if(creat>=7)  s.push({label:'Creative Thinker',cls:'pill-sage'});
+  if(answers.academic_performance==='Excellent') s.push({label:'Academic Achiever',cls:'pill-lavender'});
+  if(answers.desired_lifestyle==='Growth')    s.push({label:'High Achiever',cls:'pill-peach'});
+  if(answers.desired_lifestyle==='Creativity') s.push({label:'Creative Explorer',cls:'pill-sage'});
+  if(creat>=6&&lead>=6) s.push({label:'Entrepreneurial Spirit',cls:'pill-blush'});
+  const streamMap = {Physics:'Physics Analytical Mind',Chemistry:'Chemistry Analytical Mind',Biology:'Biomedical Thinker',Maths:'Mathematical Mind','Computer Science':'Tech-Savvy Builder',History:'Humanities Scholar','Political Science':'Policy Thinker',Psychology:'Human Behaviour Expert',Geography:'Environmental Awareness',Economics:'Economic Reasoning',Accounting:'Financial Acumen','Business Studies':'Business Mindset'};
+  if(streamMap[answers.strongest_academic]) s.push({label:streamMap[answers.strongest_academic],cls:'pill-sage'});
+  return s.slice(0,6);
+}
+
+// ═══════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display='none'; });
+  const el = document.getElementById(`page-${name}`);
+  el.style.display = 'flex';
+  setTimeout(() => el.classList.add('active'), 10);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateStep(n) {
+  for(let i=1;i<=3;i++){
+    const el = document.getElementById(`step${i}`);
+    el.className = 'nav-step'+(i<n?' done':i===n?' active':'');
+    if(i<n) el.querySelector('.step-circle').textContent = '✓';
+    else el.querySelector('.step-circle').textContent = i;
+  }
+}
+
+// Back navigation — preserves all filled data
+function goBack(target) {
+  if(target === 'register') {
+    showPage('register');
+    updateStep(1);
+    document.getElementById('step1').querySelector('.step-circle').textContent = '1';
+  } else if(target === 'questionnaire') {
+    document.getElementById('feedbackFloatBtn').classList.remove('visible');
+    showPage('questionnaire');
+    updateStep(2);
+  }
+}
+
+function restartQuiz() {
+  // Clear questionnaire selections
+  document.querySelectorAll('#page-questionnaire .q-select').forEach(s => {
+    s.value=''; s.classList.remove('filled','err');
+  });
+  document.getElementById('subjectSelect').innerHTML = '<option value="" disabled selected>Choose stream first…</option>';
+  document.getElementById('subjectSelect').disabled = true;
+  ['social','leadership','creativity'].forEach(id => {
+    for(let i=0;i<10;i++) document.getElementById(`${id}-pip-${i}`).className='pip';
+    document.getElementById(`${id}-label`).textContent='Select a score';
+  });
+  document.getElementById('progressFill').style.width='0%';
+  document.getElementById('progressText').textContent='0 / 8 completed';
+  document.getElementById('feedbackFloatBtn').classList.remove('visible');
+  showPage('questionnaire');
+  updateStep(2);
+}
+
+function shareResults() {
+  const career = document.getElementById('resultCareer').textContent;
+  const pct    = document.getElementById('resultPct').textContent;
+  const text   = `🎯 My Nexora ML career match: ${career} (${pct} match score)! Try Nexora — AI-Powered Career Guidance.`;
+  if(navigator.share) navigator.share({title:'My Nexora Career Match', text});
+  else if(navigator.clipboard) navigator.clipboard.writeText(text).then(() => alert('Result copied to clipboard! 🎉'));
+  else alert(text);
+}
+
+// ═══════════════════════════════
+// FEEDBACK SYSTEM
+// ═══════════════════════════════
+function openFeedback() {
+  // Reset form
+  document.getElementById('feedbackFormArea').style.display='block';
+  document.getElementById('feedbackSuccess').style.display='none';
+  document.getElementById('feedbackText').value='';
+  overallRating = 0;
+  catRatings = {accuracy:0,ease:0,design:0};
+  document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('lit'));
+  Object.keys(catRatings).forEach(cat => {
+    document.querySelectorAll(`#cat-${cat} .mini-star`).forEach(b => b.classList.remove('lit'));
+  });
+  document.getElementById('feedbackModal').classList.add('open');
+}
+
+function closeFeedback() {
+  document.getElementById('feedbackModal').classList.remove('open');
+}
+
+function setOverallStar(val) {
+  overallRating = val;
+  document.querySelectorAll('.star-btn').forEach(b => {
+    b.classList.toggle('lit', parseInt(b.dataset.val) <= val);
+  });
+}
+
+function setCatStar(cat, val) {
+  catRatings[cat] = val;
+  document.querySelectorAll(`#cat-${cat} .mini-star`).forEach((b, i) => {
+    b.classList.toggle('lit', i < val);
+  });
+}
+
+function submitFeedback() {
+  if(!overallRating) { alert('Please select an overall rating ⭐'); return; }
+  // In a real app, POST to /api/feedback — here we just show success
+  document.getElementById('feedbackFormArea').style.display='none';
+  document.getElementById('feedbackSuccess').style.display='block';
+  setTimeout(closeFeedback, 2800);
+}
+
+// Close modal on backdrop click
+document.getElementById('feedbackModal').addEventListener('click', function(e) {
+  if(e.target === this) closeFeedback();
+});
+</script>
+</body>
+</html>
